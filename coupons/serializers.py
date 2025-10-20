@@ -15,8 +15,11 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
 from rest_framework import serializers
-
+import logging
 from .models import Coupon
+
+
+logger = logging.getLogger(__name__)
 
 
 class CouponSerializer(serializers.ModelSerializer):
@@ -75,8 +78,6 @@ class CouponSerializer(serializers.ModelSerializer):
         from_email = settings.DEFAULT_FROM_EMAIL
         try:
             send_mail(subject, message, from_email, [email], fail_silently=False)
-        except Exception:
-            # In production you might log this error. For now we silently
-            # ignore exceptions to avoid breaking the API response.
-            pass
+        except Exception as e:
+            logger.error(f"Error sending coupon email: {e}")
         return coupon
